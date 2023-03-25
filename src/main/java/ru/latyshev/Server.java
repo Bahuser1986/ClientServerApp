@@ -8,12 +8,23 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class Server {
     public static final Logger log = LogManager.getLogger(Server.class);
     private static Set<User> users = new HashSet<>();
-    private static Map<String, List<Vote>> topicList = new HashMap<>();
+    private static Map<String, List<Vote>> topics = new HashMap<>();
+
+    static {
+        topics.put("zero votes", new ArrayList<>());
+        topics.put("one vote", new ArrayList<>(Collections.singletonList(
+                new Vote("one", "info"))));
+        topics.put("three votes", new ArrayList<>(Arrays.asList(
+                new Vote("one", "info"),
+                new Vote("two", "info"),
+                new Vote("three", "info"))));
+    }
     public static void main(String[] args){
         try (ServerSocket server = new ServerSocket(8080)){
             log.info("Server started...");
@@ -59,20 +70,21 @@ public class Server {
                           // creating new topic  
                         } else if (request.startsWith("create topic -n=")) {
                             String topicName = CommandParsing.getTopicName(request);
-                            if (topicList.containsKey(topicName)) {
+                            if (topics.containsKey(topicName)) {
                                 dataStream.writeLine(topicName + " is already exists. Use different topic name.");
                             } else {
-                                topicList.put(topicName, new ArrayList<>());
+                                topics.put(topicName, new ArrayList<>());
                                 dataStream.writeLine("You created a new topic " + topicName);
                             }
 
                         // topics view
+                        } else if (request.startsWith("view")) {
+                            if (request.equals("view")) {
+                                dataStream.writeLine(getAllVotesCount());
+                            }
+                            else if (request.startsWith("view -t=")) {}
+                            else {continue;}
                         }
-//                        else if (request.startsWith("view")) {
-//                            if (request.equals("view")) {}
-//                            else if (request.startsWith("view -t=")) {}
-//                            else {request = dataStream.readLine();}
-//                        }
                         else {
                             dataStream.writeLine("Use command 'help' for more information");
                         }
@@ -85,5 +97,16 @@ public class Server {
         } finally {
             log.info("Server stopped");
         }
+    }
+
+    //get string for "view" command
+    //!!!отбрасывается часть строки, если внутри строки есть перевод строки
+    //!!!нужен визуальный список или вывод строки в виде List???
+    private static String getAllVotesCount(){
+        return topics.entrySet()
+                .stream()
+                .map(x -> String.format("%s (votes in %s=%d)", x.getKey(), x.getKey(), x.getValue().size()))
+                .collect(Collectors.toList()).toString();
+
     }
 }

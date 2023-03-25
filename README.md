@@ -3,7 +3,8 @@
 1. (DONE) TCP client server app
 2. (IN PROGRESS) Multithreading
 3. (Done) Server logging
-4. (IN PROGRESS)Clien commands:
+4. (IN PROGRESS) Client commands:
     * (DONE) login -u=username
     * (DONE) create topic -n=<topic>
+    * (DONE?) view 
     * (IN PROGRESS) other commands
