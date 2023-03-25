@@ -5,17 +5,18 @@ import java.util.List;
 
 public class Topic {
     private String name;
-    private static List<Topic> topicList = new ArrayList<>();
+    private String author;
 
-    public Topic(String name) {
+    public Topic(String name, String author) {
         this.name = name;
+        this.author = author;
     }
 
     public String getName() {
         return name;
     }
 
-    public static List<Topic> getTopicList() {
-        return topicList;
+    public String getAuthor() {
+        return author;
     }
 }
