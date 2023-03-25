@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+//creates I/O streams
 public class DataStream implements Closeable{
     private final Socket socket;
     private final BufferedReader reader;

@@ -6,37 +6,43 @@ import java.util.Set;
 public class User {
     private String loginName;
     private boolean isLogged = false;
-    private static Set<User> users = new HashSet<>();
 
-
-    public User(String loginName) {
-        this.loginName = loginName;
+    public User(String loginName) {this.loginName = loginName;
     }
 
     public String getLoginName() {
         return loginName;
     }
 
-    public static Set<User> getUsers() {
-        return users;
+    public boolean isLogged() {
+        return isLogged;
     }
 
-    public static boolean userLogin(String login) {
-        String[] loginArr = login.split(" "); // продебажить удаление пробелов
-        String loginCommand = loginArr[0].trim();
+    public void setLogged(boolean logged) {
+        isLogged = logged;
+    }
 
-        String[] loginParams = loginArr[1].split("="); //проверить выход за границы массива
+    //login command parsing
+    public static boolean checkLoginCommand(String login) {
+        String[] loginArr = login.trim().split(" ", 2);
+        if (loginArr.length != 2) {
+            return false;
+        }
+
+        String loginCommand = loginArr[0];
+        String[] loginParams = loginArr[1].trim().split("=");
         String loginKey = loginParams[0].trim();
-        String loginName = loginParams[1].trim();
+
         if (!loginCommand.equals("login")) {
             return false;
         }
         if (!loginKey.equals("-u")) {
             return false;
         }
-        User user = new User(loginName);
-        user.isLogged = true;
-        users.add(user); // нужно сделать проверки на уникальных пользователей, на занятые имена
         return true;
+    }
+    public static String getLoginNameFromCommand(String loginName) {
+        String[] loginArr = loginName.split("=");
+        return loginArr[1].trim();
     }
 }
