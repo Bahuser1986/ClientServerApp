@@ -2,39 +2,51 @@ package ru.latyshev;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import ru.latyshev.entities.DataStream;
+import ru.latyshev.entities.User;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 
 public class Server {
-    private static final Logger log = LogManager.getLogger(Server.class);
-    public static void main(String[] args) {
+    public static final Logger log = LogManager.getLogger(Server.class);
+
+    public static void main(String[] args){
         try (ServerSocket server = new ServerSocket(8080)){
             log.info("Server started...");
 //            throw new IOException();
 
             while (true) {
-                try (Socket socket = server.accept();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    BufferedWriter writer = new BufferedWriter(
-                            new OutputStreamWriter(socket.getOutputStream()))) {
+                try (DataStream dataStream = new DataStream(server)) {
+                    String request = dataStream.readLine();
 
-                    log.info("Client connected");
+                    //login
+                    while (true) {
+                        if (request.equals("exit")) {
+                            dataStream.writeLine("Good bye!");
+                            dataStream.close();
+                        }
+                        if (User.userLogin(request)) {
+                            dataStream.writeLine("Welcome to server!");
+                            break;
+                        }
+                        request = dataStream.readLine();
+                    }
 
-                    String request = reader.readLine();
-                    System.out.println("Request: " + request);
+                    //next actions
+                    request = dataStream.readLine();
+                    while (true) {
+                        if (request.equals("exit")) {
+                            dataStream.writeLine("Good bye!");
+                            dataStream.close();
+                        }
+                        dataStream.writeLine("some answer");
+                        request = dataStream.readLine();
+                    }
 
-                    String response = "Hello from server: " + request.length();
-                    System.out.println("Response: " + response);
-                    writer.write(response);
-                    writer.newLine();
-                    writer.flush();
-
-                } catch (NullPointerException e) {
-                    log.error(e + "/" + e.getMessage());
-                    e.printStackTrace();
-                }
+                } catch (NullPointerException e) {}
             }
         } catch (IOException e) {
             log.error(e + "/" + e.getMessage());
