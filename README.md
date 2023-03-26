@@ -6,5 +6,6 @@
 4. (IN PROGRESS) Client commands:
     * (DONE) login -u=username
     * (DONE) create topic -n=<topic>
-    * (DONE?) view 
+    * (DONE?) view
+    * (DONE?) view -t=<topic>
     * (IN PROGRESS) other commands

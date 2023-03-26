@@ -27,6 +27,7 @@ public class CommandParsing {
     }
 
     public static String getTopicName(String command) {
-        return command.split("=")[1].trim();
+        String topicName = command.split("=")[1].trim();
+        return topicName.substring(1, topicName.length() - 1);
     }
 }
