@@ -11,6 +11,9 @@ public class CommandParsing {
 
         String loginCommand = loginArr[0];
         String[] loginParams = loginArr[1].trim().split("=");
+        if (loginParams.length != 2 || loginParams[1].isEmpty()) {
+            return false;
+        }
         String loginKey = loginParams[0].trim();
 
         if (!loginCommand.equals("login")) {

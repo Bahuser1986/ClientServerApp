@@ -2,11 +2,12 @@ package ru.latyshev.entities;
 
 import ru.latyshev.Server;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Vote {
-    private static DataStream dataStream;
+    private DataStream dataStream;
     private String name;
     private String description;
     private List<String> answers = new ArrayList<>();

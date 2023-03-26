@@ -59,17 +59,18 @@ public class Server {
                     }
 
                     // rest commands
+                    request = dataStream.readLine();
+                    String topicName;
                     while (true) {
-                        request = dataStream.readLine();
                         if (request.equals("exit")) {
                             dataStream.writeLine("Good bye, " + user.getLoginName() + "!");
                             dataStream.close();
                            
                           // creating new topic  
                         } else if (request.startsWith("create topic -n=")) {
-                            String topicName = CommandParsing.getTopicName(request);
+                            topicName = CommandParsing.getTopicName(request);
                             if (topics.containsKey(topicName)) {
-                                dataStream.writeLine(topicName + " is already exists. Use different topic name.");
+                                dataStream.writeLine("'" + topicName + "'" + " is already exists. Use different topic name.");
                             } else {
                                 topics.put(topicName, new ArrayList<>());
                                 dataStream.writeLine("You created a new topic " + topicName);
@@ -81,7 +82,7 @@ public class Server {
                                 dataStream.writeLine(getAllVotesCount());
                             }
                             else if (request.startsWith("view -t=")) {
-                                String topicName = CommandParsing.getTopicName(request);
+                                topicName = CommandParsing.getTopicName(request);
                                 if (topics.containsKey(topicName)) {
                                     dataStream.writeLine(getTopicVotesNames(topicName));
                                 } else {
@@ -90,19 +91,20 @@ public class Server {
                             }
 
                         // create vote
-//                        } else if (request.startsWith("create vote -t=")) {
-//                            String topicName = CommandParsing.getTopicName(request);
-//                            if (topics.containsKey(topicName)) {
-//                                Vote vote = new Vote(); /// !!! сначала нужно протестировать view -t=<topic>
-//                                vote.createVote(); // !!! голосование не создается, уходит в бесконечный цикл
-//                            } else {
-//                                dataStream.writeLine("'" + topicName + "'" + " doesn't exist. You can't create voting");
-//                            }
+                        } else if (request.startsWith("create vote -t=")) {
+                            topicName = CommandParsing.getTopicName(request);
+                            if (topics.containsKey(topicName)) {
+                                Vote vote = new Vote();
+                                vote.createVote(); // !!! голосование не создается, уходит в бесконечный цикл
+                            } else {
+                                dataStream.writeLine("'" + topicName + "'" + " doesn't exist. You can't create voting");
+                            }
 
                         // default server response after client login
                         } else {
                             dataStream.writeLine("Use command 'help'(isn't ready) for more information");
                         }
+                        request = dataStream.readLine();
                     }
                 } catch (NullPointerException e) {}
             }
@@ -125,7 +127,6 @@ public class Server {
                 .stream()
                 .map(x -> String.format("%s (votes in %s=%d)", x.getKey(), x.getKey(), x.getValue().size()))
                 .collect(Collectors.toList()).toString();
-
     }
     public static String getTopicVotesNames(String topicName){
         if (topics.get(topicName).isEmpty()) {
