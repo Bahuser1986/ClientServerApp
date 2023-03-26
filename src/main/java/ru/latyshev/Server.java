@@ -21,9 +21,10 @@ public class Server {
 
             while (true) {
                 try (DataStream dataStream = new DataStream(server)) {
-
                     User user;
 
+                    dataStream.writeLine("Conected to server...");
+                    dataStream.writeLine("Enter your username 'login -u=username'");
                     String request = dataStream.readLine();
 
                     // login
@@ -49,18 +50,18 @@ public class Server {
                     }
 
                     // rest commands
-
                     String topicName;
+                    String voteName;
                     while (true) {
                         request = dataStream.readLine();
                         if (request.equals("exit")) {
                             dataStream.writeLine("Good bye, " + user.getLoginName() + "!");
                             dataStream.close();
-                           
-                          // creating new topic  
+
+                        // creating new topic
                         } else if (request.startsWith("create topic -n=")) {
                             topicName = CommandParsing.getTopicName(request);
-                            if (Vote.topics.containsKey(topicName)) {
+                            if (isTopicExists(topicName)) {
                                 dataStream.writeLine("'" + topicName + "'" + " is already exists. Use different topic name.");
                             } else {
                                 Vote.topics.put(topicName, new ArrayList<>());
@@ -77,18 +78,40 @@ public class Server {
                                         dataStream.writeLine(voteCount);
                                     }
                                 }
-                            } else if (request.startsWith("view -t=")) { // будет конфликтовать с view -t=topic -v=vote
-                                // TODO добавить в парсинг проверки, если строка зканчивается на "="
-                                topicName = CommandParsing.getTopicName(request);
-                                if (topics.containsKey(topicName)) {
-                                    if (topics.get(topicName).isEmpty()) {
-                                        dataStream.writeLine("Nobody has created any voting yet");
+                            } else if (request.startsWith("view -t=")) {
+
+                                // view -t=<topic> -v=<vote>
+                                if (request.split("=").length == 3) {
+                                    // TODO добавить проверки на корректность команды
+                                    String[] topicAndVoteNames = CommandParsing.getTopicAndVoteNames(request);
+                                    topicName = topicAndVoteNames[0];
+                                    voteName = topicAndVoteNames[1];
+                                    if (!isTopicExists(topicName)) {
+                                        printTopicDoesNtExist(topicName);
                                     } else {
-                                        for (String voteName : getTopicVotesNames(topicName))
-                                            dataStream.writeLine(voteName);
+                                        if (!isVoteExists(topicName, voteName)) {
+                                            printVoteDoesNtExist(voteName);
+                                        } else {
+                                            printVoteNameAndAnswers(topicName, voteName, dataStream);
+                                        }
                                     }
-                                } else {
-                                    dataStream.writeLine("'" + topicName + "'" + " doesn't exist.");
+
+                                    //dataStream.writeLine();
+
+                                // view -t=<topic>
+                                } else if (request.split("=").length == 2) {
+                                    // TODO добавить в парсинг проверки, если строка зканчивается на "="
+                                    topicName = CommandParsing.getTopicName(request);
+                                    if (isTopicExists(topicName)) {
+                                        if (topics.get(topicName).isEmpty()) {
+                                            dataStream.writeLine("Nobody has created any voting yet");
+                                        } else {
+                                            for (String vote : getTopicVotesNames(topicName))
+                                                dataStream.writeLine(vote);
+                                        }
+                                    } else {
+                                        dataStream.writeLine("'" + topicName + "'" + " doesn't exist.");
+                                    }
                                 }
                             }
 
@@ -96,12 +119,12 @@ public class Server {
                         } else if (request.startsWith("create vote -t=")) {
                             // TODO добавить в парсинг проверки, если строка зканчивается на '='
                             topicName = CommandParsing.getTopicName(request);
-                            if (Vote.topics.containsKey(topicName)) {
+                            if (isTopicExists(topicName)) {
                                 String name = createVotingName(dataStream, topicName);
                                 String description = createDescription(dataStream);
-                                List<String> answers = createListOfAnswers(dataStream);
+                                Map<String, Integer> answers = createListOfAnswers(dataStream);
 
-                                Vote vote = new Vote(name, description, answers);
+                                Vote vote = new Vote(name, description, answers, user);
                                 topics.get(topicName).add(vote);
                                 dataStream.writeLine("The voting was just created");
 

@@ -1,5 +1,8 @@
 package ru.latyshev.entities;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class CommandParsing {
 
     //login command parsing
@@ -32,5 +35,14 @@ public class CommandParsing {
     public static String getTopicName(String command) {
         String topicName = command.split("=")[1].trim();
         return topicName.substring(1, topicName.length() - 1);
+    }
+
+    public static String[] getTopicAndVoteNames(String request) {
+        String[] arr = request.split("=");
+
+        String topicName = arr[1].substring(1, arr[1].lastIndexOf(" ") - 1);
+        String voteName = arr[2].substring(1, arr[2].length() - 1);
+
+        return new String[] {topicName, voteName};
     }
 }

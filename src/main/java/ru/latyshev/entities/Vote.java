@@ -4,23 +4,34 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Vote {
+    private final User owner;
     private String name;
     private String description;
+    private static DataStream dataStream;
+    private List<User> votedUsers = new ArrayList<>();
+    private Map<String, Integer> voting = new HashMap<>();
     public static Map<String, List<Vote>> topics = new HashMap<>();
 
     static {
         topics.put("zero votes", new ArrayList<>());
-        topics.put("one vote", new ArrayList<>(Collections.singletonList(
-                new Vote("one", "info", new ArrayList<>()))));
-        topics.put("three votes", new ArrayList<>(Arrays.asList(
-                new Vote("one", "info", new ArrayList<>()),
-                new Vote("two", "info", new ArrayList<>()),
-                new Vote("three", "info", new ArrayList<>()))));
+        topics.put("one vote", Collections.singletonList(
+                new Vote("one", "info", new HashMap<>(), new User("username"))));
+        topics.put("three votes", Arrays.asList(
+                new Vote("one", "info", new HashMap<>(), new User("user")),
+                new Vote("two", "info", new HashMap<>(), new User("login")),
+                new Vote("three", "info", new HashMap<>(), new User("aleks"))));
+        Map<String, Integer> map = new HashMap<>();
+        map.put("first answer", 5);
+        map.put("second answer", 0);
+        topics.put("test", Collections.singletonList(
+                new Vote("test", "info test", map, new User("user"))));
     }
 
-    public Vote(String name, String description, List<String> answers) {
+    public Vote(String name, String description, Map<String, Integer> voting, User owner) {
         this.name = name;
         this.description = description;
+        this.voting = voting;
+        this.owner = owner;
     }
 
     public String getName() {
@@ -32,9 +43,12 @@ public class Vote {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Map<String, Integer> getVoting() {
+        return voting;
     }
 
     public static String createVotingName(DataStream dataStream, String topicName) {
@@ -58,6 +72,7 @@ public class Vote {
             return request;
         }
     }
+    // TODO добавить ограничения на количество ответов
     private static int getNumberOfAnswers(DataStream dataStream) {
         while (true) {
             dataStream.writeLine("Enter number of possible answers");
@@ -68,9 +83,9 @@ public class Vote {
             return Integer.parseInt(request);
         }
     }
-    public static List<String> createListOfAnswers(DataStream dataStream) {
+    public static Map<String, Integer> createListOfAnswers(DataStream dataStream) {
         int numberOfAnswers = getNumberOfAnswers(dataStream);
-        List<String> answers = new ArrayList<>();
+        Map<String, Integer> answers = new HashMap<>();
         for (int i = 1; i <= numberOfAnswers; i++) {
             String answer;
             while (true) {
@@ -79,7 +94,7 @@ public class Vote {
                 if (answer.isEmpty()) {
                     continue;
                 } else {
-                    answers.add(i + ". " + answer);
+                    answers.put(i + ". " + answer, 0);
                     break;
                 }
             }
@@ -99,5 +114,39 @@ public class Vote {
                 .stream()
                 .map(x -> String.format("%s (votes in '%s'=%d)", x.getKey(), x.getKey(), x.getValue().size()))
                 .collect(Collectors.toList());
+    }
+    public static boolean isTopicExists(String topicName) {
+        return topics.containsKey(topicName);
+    }
+    public static void printTopicDoesNtExist(String topicName){
+        dataStream.writeLine("'" + topicName + "' doesn't exist");
+    }
+    public static boolean isVoteExists(String topicName, String voteName) {
+        return getTopicVotesNames(topicName).contains(voteName);
+    }
+    public static void printVoteDoesNtExist(String voteName){
+        dataStream.writeLine("'" + voteName + "' doesn't exist");
+    }
+    private static Vote getVote(String topicName, String voteName) {
+        List<Vote> votesList = topics.get(topicName);
+        for (Vote vote : votesList) {
+            if (vote.getName().equals(voteName)) {
+                return vote;
+            }
+        }
+        return null;
+    }
+    public static void printVoteNameAndAnswers(String topicName, String voteName, DataStream stream) {
+        Vote vote = getVote(topicName, voteName);
+        assert vote != null;
+        stream.writeLine(vote.getName());
+        StringBuilder dashes = new StringBuilder();
+        for (int i = 0; i < voteName.length(); i++) {
+            dashes.append("-");
+        }
+        stream.writeLine(dashes.toString());
+        for (Map.Entry<String, Integer> pair : vote.getVoting().entrySet()) {
+            stream.writeLine(pair.getKey() + " - " + pair.getValue() + " vote(s)");
+        }
     }
 }

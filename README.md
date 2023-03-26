@@ -9,4 +9,5 @@
     * (DONE?) view
     * (DONE?) view -t=<topic>
     * (DONE) create vote -t=<topic>
+    * (DONE) view -t=<topic> -v=<vote>
     * (IN PROGRESS) other commands
