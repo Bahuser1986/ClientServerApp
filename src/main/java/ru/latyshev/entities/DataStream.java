@@ -56,7 +56,7 @@ public class DataStream implements Closeable{
             throw new RuntimeException(e);
         }
     }
-    public String sendCommand(){
+    public String getCommand(){
         try {
             return console.readLine();
         } catch (IOException e) {

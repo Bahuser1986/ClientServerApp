@@ -52,7 +52,7 @@ public class Server {
 
                     String topicName;
                     while (true) {
-                        request = dataStream.readLine(); //если будут проблемы - попробовать вывести строку из while
+                        request = dataStream.readLine();
                         if (request.equals("exit")) {
                             dataStream.writeLine("Good bye, " + user.getLoginName() + "!");
                             dataStream.close();
@@ -68,16 +68,25 @@ public class Server {
                             }
 
                         // topics view
-                        // ??? нужен визуальный список или вывод строки в виде List?
                         } else if (request.startsWith("view")) {
                             if (request.equals("view")) {
-                                dataStream.writeLine(Vote.getAllVotesCount());
-                            }
-                            else if (request.startsWith("view -t=")) {
-                                // добавить в парсинг проверки из-за пустой строки после "="
+                                if (topics.isEmpty()) {
+                                    dataStream.writeLine("Nobody has created any topic yet");
+                                } else {
+                                    for (String voteCount : getAllVotesCount()) {
+                                        dataStream.writeLine(voteCount);
+                                    }
+                                }
+                            } else if (request.startsWith("view -t=")) { // будет конфликтовать с view -t=topic -v=vote
+                                // TODO добавить в парсинг проверки, если строка зканчивается на "="
                                 topicName = CommandParsing.getTopicName(request);
-                                if (Vote.topics.containsKey(topicName)) {
-                                    dataStream.writeLine(Vote.getTopicVotesNames(topicName));
+                                if (topics.containsKey(topicName)) {
+                                    if (topics.get(topicName).isEmpty()) {
+                                        dataStream.writeLine("Nobody has created any voting yet");
+                                    } else {
+                                        for (String voteName : getTopicVotesNames(topicName))
+                                            dataStream.writeLine(voteName);
+                                    }
                                 } else {
                                     dataStream.writeLine("'" + topicName + "'" + " doesn't exist.");
                                 }
@@ -85,6 +94,7 @@ public class Server {
 
                         // create vote
                         } else if (request.startsWith("create vote -t=")) {
+                            // TODO добавить в парсинг проверки, если строка зканчивается на '='
                             topicName = CommandParsing.getTopicName(request);
                             if (Vote.topics.containsKey(topicName)) {
                                 String name = createVotingName(dataStream, topicName);
@@ -96,7 +106,7 @@ public class Server {
                                 dataStream.writeLine("The voting was just created");
 
                             } else {
-                                dataStream.writeLine("'" + topicName + "'" + " doesn't exist. You can't create voting");
+                                dataStream.writeLine("The topic '" + topicName + "'" + " doesn't exist. You can't create voting");
                             }
                         //request = dataStream.readLine();
 
@@ -106,7 +116,9 @@ public class Server {
                         }
 
                     }
-                } catch (NullPointerException e) {}
+                } catch (NullPointerException e) {
+                    log.error(e + "/" + e.getMessage());
+                }
             }
         } catch (IOException e) {
             log.error(e + "/" + e.getMessage());

@@ -86,27 +86,18 @@ public class Vote {
         }
         return answers;
     }
-    public static String getTopicVotesNames(String topicName){
-        if (topics.get(topicName).isEmpty()) {
-            return "Nobody has created any voting yet";
-        }
+    public static List<String> getTopicVotesNames(String topicName){
         return topics.get(topicName)
                 .stream()
                 .map(x -> String.format("%s", x.getName()))
-                .collect(Collectors.toList()).toString();
+                .collect(Collectors.toList());
     }
 
-    //get string for "view" command
-    // !!!отбрасывается часть строки, если внутри строки есть перевод строки
-    // возможно из-за реализации клиента "1 запрос - 1 ответ/строка"
-    // попробовать переписать клиент под чат в конце задания
-    public static String getAllVotesCount(){
-        if (topics.isEmpty()) {
-            return "Nobody has created any topic yet";
-        }
+    //get list of topics for "view" command
+    public static List<String> getAllVotesCount(){
         return topics.entrySet()
                 .stream()
-                .map(x -> String.format("%s (votes in %s=%d)", x.getKey(), x.getKey(), x.getValue().size()))
-                .collect(Collectors.toList()).toString();
+                .map(x -> String.format("%s (votes in '%s'=%d)", x.getKey(), x.getKey(), x.getValue().size()))
+                .collect(Collectors.toList());
     }
 }
