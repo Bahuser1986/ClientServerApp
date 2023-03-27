@@ -12,7 +12,6 @@ import static ru.latyshev.entities.Vote.*;
 
 public class Server {
     public static final Logger log = LogManager.getLogger(Server.class);
-    private static Set<User> users = new HashSet<>();
 
     public static void main(String[] args){
         try (ServerSocket server = new ServerSocket(8080)){
@@ -39,7 +38,6 @@ public class Server {
 
                             user = new User(loginName);
                             user.setLogged(true);
-                            users.add(user);
 
                             dataStream.writeLine("Welcome to server, " + user.getLoginName() + "!");
                             break;
@@ -96,8 +94,6 @@ public class Server {
                                         }
                                     }
 
-                                    //dataStream.writeLine();
-
                                 // view -t=<topic>
                                 } else if (request.split("=").length == 2) {
                                     // TODO добавить в парсинг проверки, если строка зканчивается на "="
@@ -132,7 +128,7 @@ public class Server {
                                 dataStream.writeLine("The topic '" + topicName + "'" + " doesn't exist. You can't create voting");
                             }
 
-                            // vote -t=<topic> -v=<vote>
+                        // vote -t=<topic> -v=<vote>
                         } else if (request.startsWith("vote -t=")) {
                             if (request.split("=").length == 3) {
                                 // TODO добавить проверки на корректность команды
@@ -146,9 +142,36 @@ public class Server {
                                         printVoteDoesNtExist(voteName, dataStream);
                                     } else {
                                         // vote for answer
-                                        // !!! добавить проверки что пользователь не голосовал
+                                        // TODO добавить проверки что пользователь не голосовал
                                         voteForAnswer(topicName, voteName, dataStream, user);
                                         dataStream.writeLine("Thank you! Your vote is important for us!");
+                                    }
+                                }
+                            }
+
+                        // delete -t=topic -v=<vote>
+                        } else if (request.startsWith("delete -t=")) {
+                            if (request.split("=").length == 3) {
+                                // TODO добавить проверки на корректность команды
+                                String[] topicAndVoteNames = CommandParsing.getTopicAndVoteNames(request);
+                                topicName = topicAndVoteNames[0];
+                                voteName = topicAndVoteNames[1];
+                                if (!isTopicExists(topicName)) {
+                                    printTopicDoesNtExist(topicName, dataStream);
+                                } else {
+                                    if (!isVoteExists(topicName, voteName)) {
+                                        printVoteDoesNtExist(voteName, dataStream);
+                                    } else {
+                                        // delete func
+                                        if (isUserTheVoteOwner(topicName, voteName, user)) {
+                                            dataStream.writeLine("Are you sure you want to delete the vote? (y/n)");
+                                            request = dataStream.readLine().toLowerCase();
+                                            if (request.equals("y")) {
+                                                deleteTheVote(topicName, voteName, dataStream);
+                                            }
+                                        } else {
+                                            dataStream.writeLine("You can't delete the vote. You're not the owner of the vote");
+                                        }
                                     }
                                 }
                             }

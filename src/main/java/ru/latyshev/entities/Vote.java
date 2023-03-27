@@ -36,14 +36,9 @@ public class Vote {
     public String getName() {
         return name;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
+
+    public User getOwner() {
+        return owner;
     }
 
     public TreeMap<String, Integer> getVoting() {
@@ -172,7 +167,33 @@ public class Vote {
                 i++;
             }
         }
-
         vote.getVotedUsers().add(user);
+    }
+    // TODO переопределить equals для User
+    public static boolean isUserTheVoteOwner(String topicName, String voteName, User user) {
+        return Objects.requireNonNull(getVote(topicName, voteName))
+                .getOwner().getLoginName().equals(user.getLoginName());
+    }
+
+    public static void deleteTheVote(String topicName, String voteName, DataStream dataStream) {
+        List<Vote> voteList = new ArrayList<>(topics.get(topicName));
+        Iterator<Vote> iterator = voteList.iterator();
+        while (iterator.hasNext()) {
+            Vote nextVote = iterator.next();
+            if (nextVote.getName().equals(voteName)) {
+                iterator.remove();
+                break;
+            }
+        }
+        for (Map.Entry<String, List<Vote>> pair : topics.entrySet()) {
+            if (pair.getKey().equals(topicName)) {
+                pair.setValue(voteList);
+            }
+        }
+        if (!isVoteExists(topicName, voteName)) {
+            dataStream.writeLine("The vote was successfully deleted");
+        } else {
+            dataStream.writeLine("Something wrong happened. The vote wasn't deleted");
+        }
     }
 }
