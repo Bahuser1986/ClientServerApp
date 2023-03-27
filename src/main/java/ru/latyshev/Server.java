@@ -87,10 +87,10 @@ public class Server {
                                     topicName = topicAndVoteNames[0];
                                     voteName = topicAndVoteNames[1];
                                     if (!isTopicExists(topicName)) {
-                                        printTopicDoesNtExist(topicName);
+                                        printTopicDoesNtExist(topicName, dataStream);
                                     } else {
                                         if (!isVoteExists(topicName, voteName)) {
-                                            printVoteDoesNtExist(voteName);
+                                            printVoteDoesNtExist(voteName, dataStream);
                                         } else {
                                             printVoteNameAndAnswers(topicName, voteName, dataStream);
                                         }
@@ -122,7 +122,7 @@ public class Server {
                             if (isTopicExists(topicName)) {
                                 String name = createVotingName(dataStream, topicName);
                                 String description = createDescription(dataStream);
-                                Map<String, Integer> answers = createListOfAnswers(dataStream);
+                                TreeMap<String, Integer>  answers = createListOfAnswers(dataStream);
 
                                 Vote vote = new Vote(name, description, answers, user);
                                 topics.get(topicName).add(vote);
@@ -131,10 +131,32 @@ public class Server {
                             } else {
                                 dataStream.writeLine("The topic '" + topicName + "'" + " doesn't exist. You can't create voting");
                             }
-                        //request = dataStream.readLine();
+
+                            // vote -t=<topic> -v=<vote>
+                        } else if (request.startsWith("vote -t=")) {
+                            if (request.split("=").length == 3) {
+                                // TODO добавить проверки на корректность команды
+                                String[] topicAndVoteNames = CommandParsing.getTopicAndVoteNames(request);
+                                topicName = topicAndVoteNames[0];
+                                voteName = topicAndVoteNames[1];
+                                if (!isTopicExists(topicName)) {
+                                    printTopicDoesNtExist(topicName, dataStream);
+                                } else {
+                                    if (!isVoteExists(topicName, voteName)) {
+                                        printVoteDoesNtExist(voteName, dataStream);
+                                    } else {
+                                        // vote for answer
+                                        // !!! добавить проверки что пользователь не голосовал
+                                        voteForAnswer(topicName, voteName, dataStream, user);
+                                        dataStream.writeLine("Thank you! Your vote is important for us!");
+                                    }
+                                }
+                            }
+
 
                         // default server response after client login
                         } else {
+                            // TODO сделать команду help со списком всех комманд и описанием
                             dataStream.writeLine("Use command 'help'(isn't ready) for more information");
                         }
 

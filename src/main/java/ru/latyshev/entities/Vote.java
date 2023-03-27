@@ -7,27 +7,26 @@ public class Vote {
     private final User owner;
     private String name;
     private String description;
-    private static DataStream dataStream;
     private List<User> votedUsers = new ArrayList<>();
-    private Map<String, Integer> voting = new HashMap<>();
+    private TreeMap<String, Integer> voting = new TreeMap<>();
     public static Map<String, List<Vote>> topics = new HashMap<>();
 
     static {
         topics.put("zero votes", new ArrayList<>());
         topics.put("one vote", Collections.singletonList(
-                new Vote("one", "info", new HashMap<>(), new User("username"))));
+                new Vote("one", "info", new TreeMap<>(), new User("username"))));
         topics.put("three votes", Arrays.asList(
-                new Vote("one", "info", new HashMap<>(), new User("user")),
-                new Vote("two", "info", new HashMap<>(), new User("login")),
-                new Vote("three", "info", new HashMap<>(), new User("aleks"))));
-        Map<String, Integer> map = new HashMap<>();
-        map.put("first answer", 5);
-        map.put("second answer", 0);
+                new Vote("one", "info", new TreeMap<>(), new User("user")),
+                new Vote("two", "info", new TreeMap<>(), new User("login")),
+                new Vote("three", "info", new TreeMap<>(), new User("aleks"))));
+        TreeMap<String, Integer> map = new TreeMap<>();
+        map.put("1. first answer", 5);
+        map.put("2. second answer", 0);
         topics.put("test", Collections.singletonList(
                 new Vote("test", "info test", map, new User("user"))));
     }
 
-    public Vote(String name, String description, Map<String, Integer> voting, User owner) {
+    public Vote(String name, String description, TreeMap<String, Integer> voting, User owner) {
         this.name = name;
         this.description = description;
         this.voting = voting;
@@ -47,8 +46,12 @@ public class Vote {
         this.description = description;
     }
 
-    public Map<String, Integer> getVoting() {
+    public TreeMap<String, Integer> getVoting() {
         return voting;
+    }
+
+    public List<User> getVotedUsers() {
+        return votedUsers;
     }
 
     public static String createVotingName(DataStream dataStream, String topicName) {
@@ -83,9 +86,9 @@ public class Vote {
             return Integer.parseInt(request);
         }
     }
-    public static Map<String, Integer> createListOfAnswers(DataStream dataStream) {
+    public static TreeMap<String, Integer> createListOfAnswers(DataStream dataStream) {
         int numberOfAnswers = getNumberOfAnswers(dataStream);
-        Map<String, Integer> answers = new HashMap<>();
+        TreeMap<String, Integer> answers = new TreeMap<>();
         for (int i = 1; i <= numberOfAnswers; i++) {
             String answer;
             while (true) {
@@ -118,13 +121,13 @@ public class Vote {
     public static boolean isTopicExists(String topicName) {
         return topics.containsKey(topicName);
     }
-    public static void printTopicDoesNtExist(String topicName){
+    public static void printTopicDoesNtExist(String topicName, DataStream dataStream){
         dataStream.writeLine("'" + topicName + "' doesn't exist");
     }
     public static boolean isVoteExists(String topicName, String voteName) {
         return getTopicVotesNames(topicName).contains(voteName);
     }
-    public static void printVoteDoesNtExist(String voteName){
+    public static void printVoteDoesNtExist(String voteName, DataStream dataStream){
         dataStream.writeLine("'" + voteName + "' doesn't exist");
     }
     private static Vote getVote(String topicName, String voteName) {
@@ -136,17 +139,40 @@ public class Vote {
         }
         return null;
     }
-    public static void printVoteNameAndAnswers(String topicName, String voteName, DataStream stream) {
+    public static void printVoteNameAndAnswers(String topicName, String voteName, DataStream dataStream) {
         Vote vote = getVote(topicName, voteName);
         assert vote != null;
-        stream.writeLine(vote.getName());
+        dataStream.writeLine(vote.getName());
         StringBuilder dashes = new StringBuilder();
         for (int i = 0; i < voteName.length(); i++) {
             dashes.append("-");
         }
-        stream.writeLine(dashes.toString());
+        dataStream.writeLine(dashes.toString());
         for (Map.Entry<String, Integer> pair : vote.getVoting().entrySet()) {
-            stream.writeLine(pair.getKey() + " - " + pair.getValue() + " vote(s)");
+            dataStream.writeLine(pair.getKey() + " - " + pair.getValue() + " vote(s)");
         }
+    }
+    public static void voteForAnswer(String topicName, String voteName, DataStream dataStream, User user) {
+        printVoteNameAndAnswers(topicName, voteName, dataStream);
+        dataStream.writeLine("");
+        // TODO проверить на число и ограничения по кол-ву ответов
+        dataStream.writeLine("Enter number of your answer");
+        int number = Integer.parseInt(dataStream.readLine());
+
+        Vote vote = getVote(topicName, voteName);
+        assert vote != null;
+
+        TreeMap<String, Integer> map = vote.getVoting();
+        int i = 1;
+        for (Map.Entry<String, Integer> pair : map.entrySet()) {
+            if (number == i) {
+                pair.setValue(pair.getValue() + 1);
+                break;
+            } else {
+                i++;
+            }
+        }
+
+        vote.getVotedUsers().add(user);
     }
 }
