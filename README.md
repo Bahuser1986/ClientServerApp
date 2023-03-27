@@ -6,8 +6,8 @@
 4. (IN PROGRESS) Client commands:
     * (DONE) login -u=username
     * (DONE) create topic -n="topic"
-    * (DONE?) view
-    * (DONE?) view -t="topic"
+    * (DONE) view
+    * (DONE) view -t="topic"
     * (DONE) create vote -t="topic"
     * (DONE) view -t="topic" -v="vote"
     * (DONE) vote -t="topic" -v="vote"

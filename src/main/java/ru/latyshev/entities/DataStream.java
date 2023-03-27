@@ -9,14 +9,14 @@ public class DataStream implements Closeable{
     private final Socket socket;
     private final BufferedReader reader;
     private final BufferedWriter writer;
-    private BufferedReader console;
+//    private BufferedReader console;
 
     public DataStream(String ip, int port){
         try {
             this.socket = new Socket(ip, port);
             this.reader = createReader();
             this.writer = createWriter();
-            this.console = createConsole();
+            //this.console = createConsole();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,17 +56,17 @@ public class DataStream implements Closeable{
             throw new RuntimeException(e);
         }
     }
-    public String getCommand(){
-        try {
-            return console.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public String getCommand(){
+//        try {
+//            return console.readLine();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     @Override
     public void close() throws IOException {
-        console.close();
+        //console.close();
         writer.close();
         reader.close();
         socket.close();

@@ -18,43 +18,50 @@ public class Server {
             log.info("Server started...");
 //            throw new IOException();
 
-            while (true) {
-                try (DataStream dataStream = new DataStream(server)) {
-                    User user;
+            User user = null;
 
-                    dataStream.writeLine("Conected to server...");
+            while (true) {
+                boolean isActive = true;
+                try (DataStream dataStream = new DataStream(server)) {
+                    
+                    dataStream.writeLine("Connected to server...");
                     dataStream.writeLine("Enter your username 'login -u=username'");
-                    String request = dataStream.readLine();
+                    String request;
 
                     // login
-                    while (true) {
+                    boolean isLogged = false;
+                    while (!isLogged) {
+                        request = dataStream.readLine();
                         if (request.equals("exit")) {
                             dataStream.writeLine("Good bye!");
                             dataStream.close();
+                            isActive = false;
+                            break;
                         }
                         // command request checking  and creating user
-                        if (CommandParsing.checkLoginCommand(request)) {
+                        else if (CommandParsing.checkLoginCommand(request)) {
                             String loginName = CommandParsing.getLoginNameFromCommand(request);
 
                             user = new User(loginName);
                             user.setLogged(true);
 
                             dataStream.writeLine("Welcome to server, " + user.getLoginName() + "!");
-                            break;
+                            isLogged = true;
+
                         } else {
                             dataStream.writeLine("Please, enter your login 'login -u=username'");
                         }
-                        request = dataStream.readLine();
                     }
 
                     // rest commands
                     String topicName;
                     String voteName;
-                    while (true) {
+                    while (isActive) {
                         request = dataStream.readLine();
                         if (request.equals("exit")) {
                             dataStream.writeLine("Good bye, " + user.getLoginName() + "!");
                             dataStream.close();
+                            break;
 
                         // creating new topic
                         } else if (request.startsWith("create topic -n=")) {

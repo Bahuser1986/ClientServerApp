@@ -51,7 +51,6 @@ public class NewClient2 implements Runnable{
                 BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
                 while (isActive) {
                     String request = console.readLine();
-                    // TODO найти NullPointerExeption при выходе клиента
                     if (request.equals("exit")) {
                         writer.println(request);
                         console.close();
