@@ -14,4 +14,6 @@
     * (DONE) delete -t="topic" -v="vote"
     * (DONE) exit
 5. (IN PROGRESS) Server commands:
-    * (IN PROGRESS) exit
+    * (DONE) load "filename"
+    * (DONE) save "filename"
+    * (IN PROGRESS) exit (doesn't work correctly)

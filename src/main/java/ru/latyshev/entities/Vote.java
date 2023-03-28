@@ -1,9 +1,15 @@
 package ru.latyshev.entities;
 
+import ru.latyshev.Server;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Vote {
+public class Vote implements Serializable{
     private final User owner;
     private String name;
     private String description;
@@ -49,10 +55,10 @@ public class Vote {
         return votedUsers;
     }
 
-    public static String createVotingName(DataStream dataStream, String topicName) {
+    public static String createVotingName(BufferedReader reader, PrintWriter writer, String topicName) throws IOException {
         while (true) {
-            dataStream.writeLine("Enter a unique voting name");
-            String request = dataStream.readLine();
+            writer.println("Enter a unique voting name");
+            String request = reader.readLine();
             boolean isNameExists = topics.get(topicName).stream().anyMatch(x -> x.getName().equals(request));
             if (request.isEmpty() || isNameExists) {
                 continue;
@@ -60,10 +66,10 @@ public class Vote {
             return request;
         }
     }
-    public static String createDescription(DataStream dataStream) {
+    public static String createDescription(BufferedReader reader, PrintWriter writer) throws IOException {
         while (true) {
-            dataStream.writeLine("Describe the voting theme");
-            String request = dataStream.readLine();
+            writer.println("Describe the voting theme");
+            String request = reader.readLine();
             if (request.isEmpty()) {
                 continue;
             }
@@ -71,24 +77,24 @@ public class Vote {
         }
     }
     // TODO добавить ограничения на количество ответов
-    private static int getNumberOfAnswers(DataStream dataStream) {
+    private static int getNumberOfAnswers(BufferedReader reader, PrintWriter writer) throws IOException {
         while (true) {
-            dataStream.writeLine("Enter number of possible answers");
-            String request = dataStream.readLine();
+            writer.println("Enter number of possible answers");
+            String request = reader.readLine();
             if (request.isEmpty() || !request.chars().allMatch(Character::isDigit)) {
                 continue;
             }
             return Integer.parseInt(request);
         }
     }
-    public static TreeMap<String, Integer> createListOfAnswers(DataStream dataStream) {
-        int numberOfAnswers = getNumberOfAnswers(dataStream);
+    public static TreeMap<String, Integer> createListOfAnswers(BufferedReader reader, PrintWriter writer) throws IOException {
+        int numberOfAnswers = getNumberOfAnswers(reader, writer);
         TreeMap<String, Integer> answers = new TreeMap<>();
         for (int i = 1; i <= numberOfAnswers; i++) {
             String answer;
             while (true) {
-                dataStream.writeLine("Enter " + i + " answer");
-                answer = dataStream.readLine();
+                writer.println("Enter " + i + " answer");
+                answer = reader.readLine();
                 if (answer.isEmpty()) {
                     continue;
                 } else {
@@ -116,14 +122,14 @@ public class Vote {
     public static boolean isTopicExists(String topicName) {
         return topics.containsKey(topicName);
     }
-    public static void printTopicDoesNtExist(String topicName, DataStream dataStream){
-        dataStream.writeLine("'" + topicName + "' doesn't exist");
+    public static void printTopicDoesNtExist(String topicName, PrintWriter writer){
+        writer.println("'" + topicName + "' doesn't exist");
     }
     public static boolean isVoteExists(String topicName, String voteName) {
         return getTopicVotesNames(topicName).contains(voteName);
     }
-    public static void printVoteDoesNtExist(String voteName, DataStream dataStream){
-        dataStream.writeLine("'" + voteName + "' doesn't exist");
+    public static void printVoteDoesNtExist(String voteName, PrintWriter writer){
+        writer.println("'" + voteName + "' doesn't exist");
     }
     private static Vote getVote(String topicName, String voteName) {
         List<Vote> votesList = topics.get(topicName);
@@ -134,25 +140,25 @@ public class Vote {
         }
         return null;
     }
-    public static void printVoteNameAndAnswers(String topicName, String voteName, DataStream dataStream) {
+    public static void printVoteNameAndAnswers(String topicName, String voteName, PrintWriter writer) {
         Vote vote = getVote(topicName, voteName);
         assert vote != null;
-        dataStream.writeLine(vote.getName());
+        writer.println(vote.getName());
         StringBuilder dashes = new StringBuilder();
         for (int i = 0; i < voteName.length(); i++) {
             dashes.append("-");
         }
-        dataStream.writeLine(dashes.toString());
+        writer.println(dashes.toString());
         for (Map.Entry<String, Integer> pair : vote.getVoting().entrySet()) {
-            dataStream.writeLine(pair.getKey() + " - " + pair.getValue() + " vote(s)");
+            writer.println(pair.getKey() + " - " + pair.getValue() + " vote(s)");
         }
     }
-    public static void voteForAnswer(String topicName, String voteName, DataStream dataStream, User user) {
-        printVoteNameAndAnswers(topicName, voteName, dataStream);
-        dataStream.writeLine("");
+    public static void voteForAnswer(String topicName, String voteName, BufferedReader reader, PrintWriter writer, User user) throws IOException {
+        printVoteNameAndAnswers(topicName, voteName, writer);
+        writer.println("");
         // TODO проверить на число и ограничения по кол-ву ответов
-        dataStream.writeLine("Enter number of your answer");
-        int number = Integer.parseInt(dataStream.readLine());
+        writer.println("Enter number of your answer");
+        int number = Integer.parseInt(reader.readLine());
 
         Vote vote = getVote(topicName, voteName);
         assert vote != null;
@@ -175,7 +181,7 @@ public class Vote {
                 .getOwner().getLoginName().equals(user.getLoginName());
     }
 
-    public static void deleteTheVote(String topicName, String voteName, DataStream dataStream) {
+    public static void deleteTheVote(String topicName, String voteName, BufferedReader reader, PrintWriter writer) {
         List<Vote> voteList = new ArrayList<>(topics.get(topicName));
         Iterator<Vote> iterator = voteList.iterator();
         while (iterator.hasNext()) {
@@ -191,9 +197,26 @@ public class Vote {
             }
         }
         if (!isVoteExists(topicName, voteName)) {
-            dataStream.writeLine("The vote was successfully deleted");
+            writer.println("The vote was successfully deleted");
         } else {
-            dataStream.writeLine("Something wrong happened. The vote wasn't deleted");
+            writer.println("Something wrong happened. The vote wasn't deleted");
+        }
+    }
+    public static void saveVotesToFile(String path){
+        Path file = Paths.get(path);
+        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(file))){
+            Map<String, List<Vote>> map = new HashMap<>(topics);
+            out.writeObject(map);
+        } catch (IOException e) {
+            Server.log.error(e.getMessage());
+        }
+    }
+    public static void loadVotesFromFile(String path){
+        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(Paths.get(path)))){
+            HashMap<String, List<Vote>> map = (HashMap<String, List<Vote>>) in.readObject();
+            topics = new HashMap<>(map);
+        } catch (IOException | ClassNotFoundException e) {
+            Server.log.error(e.getMessage());
         }
     }
 }

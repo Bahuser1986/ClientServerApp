@@ -6,7 +6,8 @@ import java.util.Arrays;
 
 public class Test {
     public static void main(String[] args) {
-        String s = "view -t=\"zero votes\" -v=\"unique voting test\"";
-        System.out.println(Arrays.toString(CommandParsing.getTopicAndVoteNames(s)));
+        String s = "save \"unique voting test.dat\"";
+        s = s.split("\"")[1];
+        System.out.println(s);
     }
 }

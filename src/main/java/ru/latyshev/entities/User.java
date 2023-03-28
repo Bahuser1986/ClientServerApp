@@ -1,9 +1,10 @@
 package ru.latyshev.entities;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class User {
+public class User implements Serializable {
     private String loginName;
     private boolean isLogged = false;
 

@@ -45,4 +45,8 @@ public class CommandParsing {
 
         return new String[] {topicName, voteName};
     }
+    public static String getFileName(String command) {
+        String[] arr = command.split("\"");
+        return arr[1];
+    }
 }
