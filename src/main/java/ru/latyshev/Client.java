@@ -1,28 +1,73 @@
 package ru.latyshev;
 
-import ru.latyshev.entities.DataStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 
-import java.io.*;
-
-public class Client {
+public class Client implements Runnable{
+    private Socket client;
+    private BufferedReader reader;
+    private PrintWriter writer;
+    boolean isActive = true;
     private static final String IP_ADDRESS = "127.0.0.1";
-    public static void main(String[] args) {
-        try (DataStream dataStream = new DataStream(IP_ADDRESS, 8080)) {
-            System.out.println("Connected to server\nEnter your login 'login -u=username'");
+    @Override
+    public void run() {
+        try {
+            client = new Socket(IP_ADDRESS, 8080);
+            writer = new PrintWriter(client.getOutputStream(), true);
+            reader = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-            while (true) {
-                String request = dataStream.sendCommand();
-                dataStream.writeLine(request);
+            InputHandler handler = new InputHandler();
+            Thread thread = new Thread(handler);
+            thread.start();
 
-                String response = dataStream.readLine();
+            String response;
+            while ((response = reader.readLine()) != null) {
                 System.out.println(response);
-
-                if (request.equals("exit")) {
-                    break;
-                }
             }
-        } catch(IOException e){
-            throw new RuntimeException(e);
+
+        } catch (IOException e) {
+            shutdown();
         }
     }
+    private void shutdown() {
+        try {
+            isActive = false;
+            reader.close();
+            writer.close();
+            if (!client.isClosed()) {
+                client.close();
+            }
+        } catch (IOException e) {
+            shutdown();
+        }
+    }
+    class InputHandler implements Runnable {
+        @Override
+        public void run() {
+            try {
+                BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+                while (isActive) {
+                    String request = console.readLine();
+                    if (request.equals("exit")) {
+                        writer.println(request);
+                        console.close();
+                        shutdown();
+                    } else {
+                        writer.println(request);
+                    }
+                }
+            } catch (IOException e) {
+                shutdown();
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        Client client = new Client();
+        client.run();
+    }
+
 }

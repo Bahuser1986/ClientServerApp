@@ -21,14 +21,14 @@ public class DataStream implements Closeable{
             throw new RuntimeException(e);
         }
     }
-    public DataStream(ServerSocket socket) {
-        try {
+    public DataStream(ServerSocket socket) throws IOException{
+//        try {
             this.socket = socket.accept();
             this.reader = createReader();
             this.writer = createWriter();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     private BufferedReader createReader() throws IOException {
@@ -37,9 +37,9 @@ public class DataStream implements Closeable{
     private BufferedWriter createWriter() throws IOException {
         return new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
     }
-    private BufferedReader createConsole() throws IOException {
-        return new BufferedReader(new InputStreamReader(System.in));
-    }
+//    private BufferedReader createConsole() throws IOException {
+//        return new BufferedReader(new InputStreamReader(System.in));
+//    }
     public void writeLine(String message) {
         try {
             writer.write(message);
