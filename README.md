@@ -2,7 +2,7 @@
 ## Client server application for voting
 1. (DONE) TCP client server app
 2. (DONE) Multithreading
-3. (Done) Server logging
+3. (DONE) Server logging
 4. (DONE) Client commands:
     * (DONE) login -u=username
     * (DONE) create topic -n="topic"

@@ -4,15 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9889afe-11a3-4729-b43d-c551492bfd0d" name="Changes" comment="created new server class">
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+    <list default="true" id="a9889afe-11a3-4729-b43d-c551492bfd0d" name="Changes" comment="added Multithreading">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/latyshev/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/latyshev/Client.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/latyshev/NewClient2.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/latyshev/Server.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/latyshev/Server.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/latyshev/Server1.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/latyshev/entities/DataStream.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/latyshev/entities/DataStream.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +70,33 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.NewClient2">
-    <configuration name="Client" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="Client (2)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ru.latyshev.Client" />
+      <module name="ClientServerApp" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.latyshev.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Client (3)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="ru.latyshev.Client" />
+      <module name="ClientServerApp" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="ru.latyshev.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Client (4)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ru.latyshev.Client" />
       <module name="ClientServerApp" />
       <extension name="coverage">
@@ -166,39 +187,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="ru.latyshev.Server" />
-      <module name="ClientServerApp" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ru.latyshev.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Server" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="ru.latyshev.Server" />
-      <module name="ClientServerApp" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="ru.latyshev.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Application.NewClient2" />
         <item itemvalue="Application.Server1" />
-        <item itemvalue="Application.NewClient2 (1)" />
-        <item itemvalue="Application.Server1 (3)" />
-        <item itemvalue="Application.Server1 (2)" />
+        <item itemvalue="Application.Client (4)" />
+        <item itemvalue="Application.Client (3)" />
+        <item itemvalue="Application.Client (2)" />
       </list>
     </recent_temporary>
   </component>
@@ -239,7 +234,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679986218560</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added Multithreading">
+      <created>1679996257722</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1679996257722</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -257,7 +259,8 @@
     <MESSAGE value="added delete -t=&quot;topic&quot; -v=&quot;vote&quot;" />
     <MESSAGE value="fixed IOExeptions after exit" />
     <MESSAGE value="created new server class" />
-    <option name="LAST_COMMIT_MESSAGE" value="created new server class" />
+    <MESSAGE value="added Multithreading" />
+    <option name="LAST_COMMIT_MESSAGE" value="added Multithreading" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
