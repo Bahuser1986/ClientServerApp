@@ -15,10 +15,6 @@ public class User implements Serializable {
         return loginName;
     }
 
-    public boolean isLogged() {
-        return isLogged;
-    }
-
     public void setLogged(boolean logged) {
         isLogged = logged;
     }

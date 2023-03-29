@@ -1,4 +1,3 @@
-# ClientServerApp
 ## Client server application for voting
 1. (DONE) TCP client server app
 2. (DONE) Multithreading
@@ -17,5 +16,5 @@
     * (DONE) load "filename"
     * (DONE) save "filename"
     * (DONE) exit
-Bonus:
+6. Bonus:
     * help

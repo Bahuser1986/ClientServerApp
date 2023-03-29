@@ -195,7 +195,7 @@ public class Server implements Runnable{
                             writer.println("The voting was just created");
 
                         } else {
-                            writer.println("The topic '" + topicName + "'" + " doesn't exist. You can't create voting");
+                            writer.println("'" + topicName + "'" + " doesn't exist. You can't create voting");
                         }
 
                     // vote -t=<topic> -v=<vote>
