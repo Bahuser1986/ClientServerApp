@@ -9,30 +9,33 @@ import ru.latyshev.entities.Vote;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import static ru.latyshev.entities.Vote.*;
 
 public class Server implements Runnable{
-    BufferedReader reader;
+    BufferedReader console;
     private ExecutorService pool;
     private ServerSocket server;
-    private boolean isServerActive = true;
+    private boolean isServerActive;
     private List<ConnectionHandler> connections;
     public static final Logger log = LogManager.getLogger(Server.class);
 
     public Server() {
+        isServerActive = true;
         connections = new ArrayList<>();
-        reader = new BufferedReader(new InputStreamReader(System.in));
-
+        console = new BufferedReader(new InputStreamReader(System.in));
     }
+
     public void shutdown() {
         try {
             isServerActive = false;
             for (ConnectionHandler handler : connections) {
                 handler.shutdown();
             }
+            pool.shutdown();
             if (!server.isClosed()) {
                 server.close();
             }
@@ -45,12 +48,13 @@ public class Server implements Runnable{
     @Override
     public void run() {
         try {
-
             server = new ServerSocket(8080);
             log.info("Server started...");
             pool = Executors.newCachedThreadPool();
 
-            new Thread(()->{new InputHandler().run();}).start();
+            new Thread(() -> {
+                new InputHandler().run();
+            }).start();
 
             while (isServerActive) {
                 Socket client = server.accept();
@@ -58,9 +62,12 @@ public class Server implements Runnable{
                 connections.add(connectionHandler);
                 pool.execute(connectionHandler);
             }
-        } catch (Exception e) {
+        }catch (SocketException e) {
+            log.error("Server stopped");
             shutdown();
+        } catch (Exception e) {
             log.error(e.getMessage());
+            shutdown();
         }
     }
     class ConnectionHandler implements Runnable {
@@ -265,7 +272,6 @@ public class Server implements Runnable{
         @Override
         public void run() {
             try {
-                BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
                 while (isServerActive) {
                     String consoleCommand = console.readLine();
                     if (consoleCommand.equals("exit")) {
@@ -273,7 +279,7 @@ public class Server implements Runnable{
                         shutdown();
                     } else if (consoleCommand.startsWith("save \"")) {
                         saveVotesToFile(CommandParsing.getFileName(consoleCommand));
-                    }else if (consoleCommand.startsWith("load \"")) {
+                    } else if (consoleCommand.startsWith("load \"")) {
                         loadVotesFromFile(CommandParsing.getFileName(consoleCommand));
                     }
                 }

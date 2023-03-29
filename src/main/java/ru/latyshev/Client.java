@@ -50,8 +50,8 @@ public class Client implements Runnable{
             try {
                 BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
                 while (isActive) {
+                    // TODO отловить NullPointerException на сервере при выходе клиента через telnet
                     String request = console.readLine();
-                    // TODO найти NullPointerException на сервере при выходе клиента
                     if (request.equals("exit")) {
                         writer.println(request);
                         console.close();
