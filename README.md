@@ -13,7 +13,9 @@
     * (DONE) vote -t="topic" -v="vote"
     * (DONE) delete -t="topic" -v="vote"
     * (DONE) exit
-5. (IN PROGRESS) Server commands:
+5. (DONE) Server commands:
     * (DONE) load "filename"
     * (DONE) save "filename"
-    * (IN PROGRESS) exit (doesn't work correctly)
+    * (DONE) exit
+Bonus:
+    * help

@@ -1,6 +1,8 @@
 package ru.latyshev.entities;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandParsing {
@@ -48,5 +50,27 @@ public class CommandParsing {
     public static String getFileName(String command) {
         String[] arr = command.split("\"");
         return arr[1];
+    }
+    public static void sendHelpMessage(PrintWriter writer) {
+        List<String> helpList = Arrays.asList(
+                "*******************************",
+                "******* Client commands *******",
+                "* login -u=username           *",
+                "* create topic -n=\"topic\"     *",
+                "* view                        *",
+                "* view -t=\"topic\"             *",
+                "* create vote -t=\"topic\"      *",
+                "* view -t=\"topic\" -v=\"vote\"   *",
+                "* vote -t=\"topic\" -v=\"vote\"   *",
+                "* delete -t=\"topic\" -v=\"vote\" *",
+                "* exit                        *",
+                "******* Server commands *******",
+                "* load \"filename\"             *",
+                "* save \"filename\"             *",
+                "* exit                        *",
+                "*******************************");
+        for (String response : helpList) {
+            writer.println(response);
+        }
     }
 }

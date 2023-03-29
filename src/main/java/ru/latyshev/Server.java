@@ -245,11 +245,13 @@ public class Server implements Runnable{
                                 }
                             }
                         }
+                    // help message
+                    } else if (request.equals("help")) {
+                        CommandParsing.sendHelpMessage(writer);
 
                     // default server response after client login
                     } else {
-                        // TODO сделать команду help со списком всех комманд и описанием
-                        writer.println("Use command 'help'(isn't ready) for more information");
+                        writer.println("Use command 'help' for more information");
                     }
                 }
             } catch (IOException e) {
